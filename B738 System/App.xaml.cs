@@ -7,11 +7,15 @@ public partial class App : Application
 
 	public static App Instance { get; private set; }
 
+	public WebServer server;
+
 	public App()
 	{
 		Instance = this;
 
 		InitializeComponent();
+
+		server = new WebServer();
 
         splashScreen = new SplashScreen();
 		mainPage = new MainPage();

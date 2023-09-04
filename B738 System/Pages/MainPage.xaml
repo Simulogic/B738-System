@@ -17,6 +17,14 @@
                 FontSize="18"
                 HorizontalOptions="Center" />
 
+            <Label
+                x:Name="CurrentData"
+                Text=""
+                HorizontalOptions="Center"
+                SemanticProperties.HeadingLevel="Level2"
+                FontSize="18"
+                TextColor="#233565"/>
+
         </VerticalStackLayout>
     </ScrollView>
 

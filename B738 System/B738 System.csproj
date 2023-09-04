@@ -58,6 +58,7 @@
 
 	<ItemGroup>
 		<PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="7.0.0" />
+		<PackageReference Include="Watson" Version="5.1.2" />
 	</ItemGroup>
 
 	<ItemGroup>
