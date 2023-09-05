@@ -4,15 +4,14 @@ using System.Text;
 using WatsonWebserver;
 using System.Diagnostics;
 using XPlaneConnector;
+using B738_System.XPlane;
 
 namespace B738_System
 {
     public class WebServer
     {
         public Server server;
-        public static XPlaneConnector.XPlaneConnector connector;
-
-        public static Dictionary<string, string> data = new Dictionary<string, string>();
+        public static ISimConnector simConnection;
 
         public WebServer()
         {
@@ -23,36 +22,25 @@ namespace B738_System
 
             server.Start();
 
-            connector = new XPlaneConnector.XPlaneConnector();
-
-            RegisterCDUDataXplane();
-
-            connector.Start();
-        }
-
-        public void RegisterCDUDataXplane()
-        {
-            connector.Subscribe(new StringDataRefElement() { DataRef = "laminar/B738/fmc1/Line_entry", Frequency = 5, StringLenght = 1 }, 5, (element, value) =>
+            // Find a way to either detect the sim or set the sim
+            if(true) // Xplane
             {
-                data["line_entry"] = value;
-            });
-
-            connector.Subscribe(new StringDataRefElement() { DataRef = "laminar/B738/fmc1/Line00_L", Frequency = 5, StringLenght = 24 }, 5, (element, value) =>
+                simConnection = new XPSimConnector();
+                simConnection.Connect();
+                simConnection.RegisterData();
+            }
+            else // MSFS
             {
-                data["line00_l"] = value;
-            });
 
-            connector.Subscribe(new StringDataRefElement() { DataRef = "laminar/B738/fmc1/Line00_G", Frequency = 5, StringLenght = 1 }, 5, (element, value) =>
-            {
-                data["line00_g"] = value;
-            });
+            }
+
         }
 
         static async Task GetCDUVariableRoute(HttpContext ctx)
         {
             var dataref = ctx.Request.Url.Parameters["dataref"];
-            Debug.WriteLine("Returning CDU Variable " + data[dataref]);
-            await ctx.Response.Send(data[dataref]);
+            Debug.WriteLine("Returning CDU Variable " + simConnection.SimData[dataref]);
+            await ctx.Response.Send(simConnection.SimData[dataref]); 
         }
 
         static async Task RegisterModuleRoute(HttpContext ctx)
