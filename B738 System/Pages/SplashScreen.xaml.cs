@@ -1,3 +1,5 @@
+using WatsonWebserver;
+
 namespace B738_System;
 
 public partial class SplashScreen : ContentPage
@@ -10,7 +12,10 @@ public partial class SplashScreen : ContentPage
 		{
 			App.Instance.MainPage = App.Instance.mainPage;
 
-			return false;
+            App.Instance.server = new WebServer();
+
+
+            return false;
         });
 	}
 }

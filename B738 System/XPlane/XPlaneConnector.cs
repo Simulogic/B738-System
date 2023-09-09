@@ -223,7 +223,7 @@ namespace XPlaneConnector
         /// <param name="dataref">DataRef to subscribe to</param>
         /// <param name="frequency">Times per seconds X-Plane will be seding this value</param>
         /// <param name="onchange">Callback invoked every time a change in the value is detected</param>
-        public void Subscribe(StringDataRefElement dataref, int frequency = -1, Action<StringDataRefElement, string> onchange = null)
+        public void SubscribeString(StringDataRefElement dataref, int frequency = -1, Action<StringDataRefElement, string> onchange = null)
         {
             //if (onchange != null)
             //    dataref.OnValueChange += (e, v) => { onchange(e, v); };
@@ -250,6 +250,15 @@ namespace XPlaneConnector
                     dataref.Update(currentIndex, character);
                 });
             }
+
+            new Thread(() =>
+            {
+                while (true)
+                {
+                    Thread.Sleep(200);
+                    onchange(dataref, dataref.Value);
+                }
+            }).Start();
         }
 
         /// <summary>

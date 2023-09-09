@@ -9,6 +9,8 @@ namespace B738_System.XPlane
 
         public Dictionary<string, string> SimData { get => _simData; }
 
+        public object Connection => _connector;
+
         public void Connect()
         {
             _connector = new XPlaneConnector.XPlaneConnector();
@@ -22,7 +24,7 @@ namespace B738_System.XPlane
 
         public void RegisterData()
         {
-            XPCDUData.RegisterData(_connector);
+
         }
     }
 }

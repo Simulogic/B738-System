@@ -5,6 +5,8 @@ using WatsonWebserver;
 using System.Diagnostics;
 using XPlaneConnector;
 using B738_System.XPlane;
+using Newtonsoft.Json;
+using B738_System.MSFS;
 
 namespace B738_System
 {
@@ -12,35 +14,43 @@ namespace B738_System
     {
         public Server server;
         public static ISimConnector simConnection;
+        public static ICDUData cduData;
 
         public WebServer()
         {
             server = new Server("127.0.0.1", 8420, false, DefaultRoute);
 
             server.Routes.Parameter.Add(WatsonWebserver.HttpMethod.POST, "/register/{moduleid}", RegisterModuleRoute);
-            server.Routes.Parameter.Add(WatsonWebserver.HttpMethod.GET, "/CDU/{dataref}", GetCDUVariableRoute);
+            server.Routes.Parameter.Add(WatsonWebserver.HttpMethod.GET, "/CDU/{index}", GetCDUDataRoute);
 
             server.Start();
 
             // Find a way to either detect the sim or set the sim
-            if(true) // Xplane
+            if(true) // MSFS
+            {
+                simConnection = new MSSimConnector();
+                cduData = new MSCDUData();
+                
+            }
+            else // XPLANE
             {
                 simConnection = new XPSimConnector();
-                simConnection.Connect();
-                simConnection.RegisterData();
+                cduData = new XPCDUData();
             }
-            else // MSFS
-            {
 
-            }
+            cduData.RegisterData(simConnection.Connection);
+
+            simConnection.Connect();
+            simConnection.RegisterData();
 
         }
 
-        static async Task GetCDUVariableRoute(HttpContext ctx)
+        static async Task GetCDUDataRoute(HttpContext ctx)
         {
-            var dataref = ctx.Request.Url.Parameters["dataref"];
-            Debug.WriteLine("Returning CDU Variable " + simConnection.SimData[dataref]);
-            await ctx.Response.Send(simConnection.SimData[dataref]); 
+            var index = ctx.Request.Url.Parameters["index"];
+            string jsonString = JsonConvert.SerializeObject(cduData.GetData(Convert.ToUInt32(index)));
+            //Debug.WriteLine("Returning CDU Data " + jsonString);
+            await ctx.Response.Send(jsonString); 
         }
 
         static async Task RegisterModuleRoute(HttpContext ctx)
@@ -52,7 +62,7 @@ namespace B738_System
 
         static async Task DefaultRoute(HttpContext ctx)
         {
-            Debug.WriteLine("This route has not been implemented yet");
+            //Debug.WriteLine("This route has not been implemented yet");
             await ctx.Response.Send("This route has not been implemented yet");
         }
     }

@@ -8,5 +8,7 @@
         public void Disconnect();
 
         public void RegisterData();
+
+        public object Connection { get; }
     }
 }

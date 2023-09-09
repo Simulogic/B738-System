@@ -15,8 +15,6 @@ public partial class App : Application
 
 		InitializeComponent();
 
-		server = new WebServer();
-
         splashScreen = new SplashScreen();
 		mainPage = new MainPage();
 

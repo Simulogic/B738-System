@@ -55,9 +55,9 @@ namespace XPlaneConnector
                     }
                 }
 
-                if (/*IsCompletelyInitialized && */fireEvent)
+                if (IsCompletelyInitialized && fireEvent)
                 {
-                    OnValueChange?.Invoke(this, Value);
+                    //OnValueChange?.Invoke(this, Value);
                     CharactersInitialized = 0;
                 }
             }
