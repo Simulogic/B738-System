@@ -1,5 +1,4 @@
 ﻿using Microsoft.FlightSimulator.SimConnect;
-using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
@@ -96,68 +95,71 @@ namespace B738_System.MSFS
 
         public override bool ProcessData(object data)
         {
-            if (data is SIMCONNECT_RECV_CLIENT_DATA clientData)
+            if (data is RecvSimDataArgs e)
             {
-                if (clientData.dwRequestID == (uint)DATA_REQUESTS.CDU_REQUEST)
+                if (e.data is SIMCONNECT_RECV_CLIENT_DATA clientData)
                 {
-                    PMDG_CDU_SCREEN screen = (PMDG_CDU_SCREEN)clientData.dwData[0];
-                    for (int i = 0; i < Columns; i++)
+                    if (clientData.dwRequestID == (uint)DATA_REQUESTS.CDU_REQUEST)
                     {
-                        for (int j = 0; j < Rows; j++)
+                        PMDG_CDU_SCREEN screen = (PMDG_CDU_SCREEN)clientData.dwData[0];
+                        for (int i = 0; i < Columns; i++)
                         {
-                            _cduData[0][i, j].S = screen.cduCols[i].cduRows[j].Symbol;
-                            _cduData[0][i, j].C = screen.cduCols[i].cduRows[j].Color;
-                            _cduData[0][i, j].F = screen.cduCols[i].cduRows[j].Flags;
-                        }
-                    }
-
-                    if (_enableDebugPrinting)
-                    {
-                        string debugtext = "";
-                        for (int i = 0; i < Rows; i++)
-                        {
-                            for (int j = 0; j < Columns; j++)
+                            for (int j = 0; j < Rows; j++)
                             {
-                                debugtext += _cduData[0][j, i].S.ToString();
+                                _cduData[0][i, j].S = screen.cduCols[i].cduRows[j].Symbol;
+                                _cduData[0][i, j].C = screen.cduCols[i].cduRows[j].Color;
+                                _cduData[0][i, j].F = screen.cduCols[i].cduRows[j].Flags;
                             }
-                            debugtext += "\n";
                         }
 
-                        Debug.Print(debugtext);
-                    }
-
-                    return true;
-                }
-
-                if (clientData.dwRequestID == (uint)DATA_REQUESTS.CDU2_REQUEST)
-                {
-                    PMDG_CDU_SCREEN screen = (PMDG_CDU_SCREEN)clientData.dwData[0];
-                    for (int i = 0; i < Columns; i++)
-                    {
-                        for (int j = 0; j < Rows; j++)
+                        if (_enableDebugPrinting)
                         {
-                            _cduData[1][i, j].S = screen.cduCols[i].cduRows[j].Symbol;
-                            _cduData[1][i, j].C = screen.cduCols[i].cduRows[j].Color;
-                            _cduData[1][i, j].F = screen.cduCols[i].cduRows[j].Flags;
-                        }
-                    }
-
-                    if (_enableDebugPrinting)
-                    {
-                        string debugtext = "";
-                        for (int i = 0; i < Rows; i++)
-                        {
-                            for (int j = 0; j < Columns; j++)
+                            string debugtext = "";
+                            for (int i = 0; i < Rows; i++)
                             {
-                                debugtext += _cduData[1][j, i].S.ToString();
+                                for (int j = 0; j < Columns; j++)
+                                {
+                                    debugtext += _cduData[0][j, i].S.ToString();
+                                }
+                                debugtext += "\n";
                             }
-                            debugtext += "\n";
+
+                            Debug.Print(debugtext);
                         }
 
-                        Debug.Print(debugtext);
+                        return true;
                     }
 
-                    return true;
+                    if (clientData.dwRequestID == (uint)DATA_REQUESTS.CDU2_REQUEST)
+                    {
+                        PMDG_CDU_SCREEN screen = (PMDG_CDU_SCREEN)clientData.dwData[0];
+                        for (int i = 0; i < Columns; i++)
+                        {
+                            for (int j = 0; j < Rows; j++)
+                            {
+                                _cduData[1][i, j].S = screen.cduCols[i].cduRows[j].Symbol;
+                                _cduData[1][i, j].C = screen.cduCols[i].cduRows[j].Color;
+                                _cduData[1][i, j].F = screen.cduCols[i].cduRows[j].Flags;
+                            }
+                        }
+
+                        if (_enableDebugPrinting)
+                        {
+                            string debugtext = "";
+                            for (int i = 0; i < Rows; i++)
+                            {
+                                for (int j = 0; j < Columns; j++)
+                                {
+                                    debugtext += _cduData[1][j, i].S.ToString();
+                                }
+                                debugtext += "\n";
+                            }
+
+                            Debug.Print(debugtext);
+                        }
+
+                        return true;
+                    }
                 }
             }
 

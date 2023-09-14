@@ -18,8 +18,8 @@ namespace B738_System.MSFS
         private bool _simConnectConnected = false;
         private bool _connected = false;
 
-        public bool IsConnected { get { return _connected; } }
-        public bool IsSimConnectConnected { get { return _simConnectConnected; } }
+        public override bool IsConnected => _connected;
+        public override bool IsConnectorConnected => _simConnectConnected;
 
         public SimConnect SimConnect { get { return _simConnect; } }
 
@@ -41,7 +41,7 @@ namespace B738_System.MSFS
         #region Connection Events
         public override void Connect()
         {
-            if(!_simConnectConnected )
+            if(!IsConnectorConnected)
             {
                 try
                 {
@@ -71,6 +71,26 @@ namespace B738_System.MSFS
 
             // Register client data event
             sender.OnRecvClientData += SimConnect_OnRecvClientData;
+            sender.OnRecvSimobjectData += SimConnect_OnRecvSimobjectData;
+            sender.OnRecvSystemState += SimConnect_OnRecvSystemState;
+        }
+
+        private void SimConnect_OnRecvSystemState(SimConnect sender, SIMCONNECT_RECV_SYSTEM_STATE data)
+        {
+            RecvSimDataArgs args = new RecvSimDataArgs
+            {
+                data = data
+            };
+            OnRecvSimSystemData(args);
+        }
+
+        private void SimConnect_OnRecvSimobjectData(SimConnect sender, SIMCONNECT_RECV_SIMOBJECT_DATA data)
+        {
+            RecvSimDataArgs args = new RecvSimDataArgs
+            {
+                data = data
+            };
+            OnRecvSimUserData(args);
         }
 
         private void SimConnect_OnRecvClientData(SimConnect sender, SIMCONNECT_RECV_CLIENT_DATA data)
@@ -108,9 +128,19 @@ namespace B738_System.MSFS
             _handle = handle;
         }
 
-        protected override void OnRecvSimData(RecvSimDataArgs e)
+        public override void OnRecvSimData(RecvSimDataArgs e)
         {
             base.OnRecvSimData(e);
+        }
+
+        public override void OnRecvSimUserData(RecvSimDataArgs e)
+        {
+            base.OnRecvSimUserData(e);
+        }
+
+        public override void OnRecvSimSystemData(RecvSimDataArgs e)
+        {
+            base.OnRecvSimSystemData(e);
         }
     }
 }
